@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Civil FC | Shymoli Ideal Polytechnic Institute</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="script.js" defer></script>
+</head>
+
+<body>
+
+<!-- ================= LOGIN ================= -->
+
+<div id="loginScreen" class="login-screen">
+
+    <div class="login-background"></div>
+
+    <div class="login-box">
+
+        <div class="login-logo">
+            <div class="logo-circle">CF</div>
+        </div>
+
+        <h1>Civil FC</h1>
+
+        <p class="login-subtitle">
+            Shymoli Ideal Polytechnic Institute
+        </p>
+
+        <form id="loginForm">
+
+            <div class="input-group">
+                <label>Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    placeholder="Enter username"
+                    autocomplete="username"
+                    required
+                >
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter password"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <button class="primary-btn login-btn" type="submit">
+                Login
+                <span>→</span>
+            </button>
+
+            <p id="loginError" class="login-error"></p>
+
+        </form>
+
+        <div class="login-footer">
+            CIVIL 4TH CLASS • CIVIL FC
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ================= MAIN WEBSITE ================= -->
+
+<div id="website" class="hidden">
+
+    <!-- NAVBAR -->
+
+    <header class="navbar">
+
+        <div class="nav-container">
+
+            <a href="#home" class="brand">
+                <div class="brand-logo">CF</div>
+
+                <div>
+                    <strong>Civil FC</strong>
+                    <small>Civil 4th Class</small>
+                </div>
+            </a>
+
+            <button id="menuBtn" class="menu-btn">☰</button>
+
+            <nav id="navMenu">
+
+                <a href="#home">Home</a>
+                <a href="#team">Team</a>
+                <a href="#match">Match</a>
+                <a href="#notices">Notices</a>
+                <a href="#study">Study</a>
+                <a href="#about">About</a>
+
+                <button id="adminOpenBtn" class="admin-nav-btn">
+                    Admin
+                </button>
+
+                <button id="themeBtn" class="theme-btn">
+                    ◐
+                </button>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+    <!-- ================= HERO ================= -->
+
+    <main>
+
+        <section id="home" class="hero">
+
+            <div class="hero-content">
+
+                <div class="hero-badge">
+                    CIVIL 4TH CLASS
+                </div>
+
+                <h1>
+                    Welcome to
+                    <span>Civil FC</span>
+                </h1>
+
+                <p>
+                    One class. One team. One identity.
+                    <br>
+                    Built together, stronger together.
+                </p>
+
+                <div class="hero-buttons">
+
+                    <a href="#team" class="primary-btn">
+                        Meet The Team →
+                    </a>
+
+                    <a href="#match" class="secondary-btn">
+                        Match Center
+                    </a>
+
+                </div>
+
+            </div>
+
+            <div class="hero-card">
+
+                <div class="hero-card-top">
+                    <span>TEAM</span>
+                    <span>CF</span>
+                </div>
+
+                <div class="hero-emblem">
+                    CF
+                </div>
+
+                <h3>CIVIL FC</h3>
+
+                <p>
+                    Shymoli Ideal Polytechnic Institute
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= QUICK INFO ================= -->
+
+        <section class="stats-section">
+
+            <div class="stat-card">
+                <span class="stat-icon">👥</span>
+                <div>
+                    <strong>9</strong>
+                    <small>Players</small>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-icon">⚽</span>
+                <div>
+                    <strong>FC</strong>
+                    <small>Football Team</small>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-icon">🎓</span>
+                <div>
+                    <strong>4th</strong>
+                    <small>Civil Class</small>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-icon">📍</span>
+                <div>
+                    <strong>Dhaka</strong>
+                    <small>Location</small>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- ================= TEAM ================= -->
+
+        <section id="team" class="section">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-label">OUR SQUAD</span>
+                    <h2>Civil FC Team</h2>
+                </div>
+
+                <div class="team-search">
+                    <input
+                        type="text"
+                        id="playerSearch"
+                        placeholder="Search player..."
+                    >
+                </div>
+
+            </div>
+
+            <div id="playerGrid" class="player-grid"></div>
+
+        </section>
+
+
+        <!-- ================= MATCH ================= -->
+
+        <section id="match" class="section match-section">
+
+            <div class="section-heading center-heading">
+
+                <span class="section-label">MATCH CENTER</span>
+
+                <h2>Next Match</h2>
+
+                <p>
+                    All match information is managed from the Admin Panel.
+                </p>
+
+            </div>
+
+            <div class="match-card">
+
+                <div class="team-side">
+
+                    <div class="team-badge large">
+                        CF
+                    </div>
+
+                    <h3>Civil FC</h3>
+
+                    <span>HOME</span>
+
+                </div>
+
+
+                <div class="match-info">
+
+                    <div class="vs">VS</div>
+
+                    <div class="match-details">
+
+                        <div>
+                            <span>Opponent</span>
+                            <strong id="opponentDisplay">
+                                Opponent
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Date</span>
+                            <strong id="matchDate">
+                                Not set
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Time</span>
+                            <strong id="matchTime">
+                                Not set
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Venue</span>
+                            <strong id="matchVenue">
+                                Shymoli
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="team-side">
+
+                    <div class="team-badge opponent">
+                        VS
+                    </div>
+
+                    <h3 id="opponentName">
+                        Opponent
+                    </h3>
+
+                    <span>AWAY</span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= NOTICES ================= -->
+
+        <section id="notices" class="section">
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-label">UPDATES</span>
+                    <h2>Notice Board</h2>
+                </div>
+
+            </div>
+
+            <div id="noticeGrid" class="notice-grid"></div>
+
+        </section>
+
+
+        <!-- ================= STUDY ================= -->
+
+        <section id="study" class="section">
+
+            <div class="section-heading center-heading">
+
+                <span class="section-label">CIVIL 4TH</span>
+
+                <h2>Study Hub</h2>
+
+                <p>
+                    Keep your class resources organized in one place.
+                </p>
+
+            </div>
+
+            <div class="study-grid">
+
+                <div class="study-card">
+                    <div class="study-icon">📘</div>
+                    <h3>Class Notes</h3>
+                    <p>
+                        Important notes and learning materials.
+                    </p>
+                </div>
+
+                <div class="study-card">
+                    <div class="study-icon">📐</div>
+                    <h3>Civil Subjects</h3>
+                    <p>
+                        Useful resources for Civil 4th semester.
+                    </p>
+                </div>
+
+                <div class="study-card">
+                    <div class="study-icon">📄</div>
+                    <h3>PDF Resources</h3>
+                    <p>
+                        Study PDFs can be added here later.
+                    </p>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= ABOUT ================= -->
+
+        <section id="about" class="about-section">
+
+            <div class="about-content">
+
+                <span class="section-label">
+                    ABOUT CIVIL FC
+                </span>
+
+                <h2>
+                    More than a class.
+                    <br>
+                    It's a team.
+                </h2>
+
+                <p>
+                    Civil FC is the football team of Civil 4th Class
+                    at Shymoli Ideal Polytechnic Institute.
+                    This website is designed to keep our team,
+                    matches, notices and study information together.
+                </p>
+
+            </div>
+
+            <div class="about-mark">
+                CF
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= FOOTER ================= -->
+
+    <footer>
+
+        <div class="footer-brand">
+            <div class="brand-logo">CF</div>
+
+            <div>
+                <strong>Civil FC</strong>
+                <small>Civil 4th Class</small>
+            </div>
+        </div>
+
+        <p>
+            © 2026 Civil FC. Built for the team.
+        </p>
+
+    </footer>
+
+</div>
+
+
+<!-- ================= ADMIN LOGIN MODAL ================= -->
+
+<div id="adminLoginModal" class="modal">
+
+    <div class="modal-box admin-login-box">
+
+        <button class="modal-close" data-close="adminLoginModal">
+            ×
+        </button>
+
+        <div class="modal-icon">
+            🔐
+        </div>
+
+        <span class="section-label">
+            RESTRICTED AREA
+        </span>
+
+        <h2>Admin Login</h2>
+
+        <p>
+            Sign in to manage Civil FC information.
+        </p>
+
+        <form id="adminLoginForm">
+
+            <div class="input-group">
+                <label>Admin Username</label>
+
+                <input
+                    type="text"
+                    id="adminUsername"
+                    placeholder="Admin username"
+                    required
+                >
+            </div>
+
+            <div class="input-group">
+                <label>Admin Password</label>
+
+                <input
+                    type="password"
+                    id="adminPassword"
+                    placeholder="Admin password"
+                    required
+                >
+            </div>
+
+            <button class="primary-btn full-btn">
+                Access Dashboard →
+            </button>
+
+            <p id="adminLoginError" class="login-error"></p>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ================= ADMIN DASHBOARD ================= -->
+
+<div id="adminModal" class="modal">
+
+    <div class="admin-dashboard">
+
+        <aside class="admin-sidebar">
+
+            <div class="admin-brand">
+
+                <div class="brand-logo">
+                    CF
+                </div>
+
+                <div>
+                    <strong>Admin</strong>
+                    <small>Civil FC</small>
+                </div>
+
+            </div>
+
+            <div class="admin-menu">
+
+                <button class="admin-menu-item active">
+                    <span>▦</span>
+                    Dashboard
+                </button>
+
+                <button
+                    class="admin-menu-item"
+                    onclick="document.getElementById('adminMatch').scrollIntoView({behavior:'smooth'})"
+                >
+                    <span>⚽</span>
+                    Match
+                </button>
+
+                <button
+                    class="admin-menu-item"
+                    onclick="document.getElementById('adminNotice').scrollIntoView({behavior:'smooth'})"
+                >
+                    <span>📢</span>
+                    Notices
+                </button>
+
+            </div>
+
+            <button id="adminLogout" class="admin-logout">
+                Logout
+            </button>
+
+        </aside>
+
+
+        <div class="admin-main">
+
+            <div class="admin-topbar">
+
+                <div>
+                    <span class="section-label">
+                        CONTROL CENTER
+                    </span>
+
+                    <h2>Admin Dashboard</h2>
+                </div>
+
+                <button
+                    class="modal-close dashboard-close"
+                    data-close="adminModal"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <!-- DASHBOARD CARDS -->
+
+            <div class="admin-overview">
+
+                <div class="overview-card">
+                    <span>TEAM</span>
+                    <strong>Civil FC</strong>
+                    <small>Active</small>
+                </div>
+
+                <div class="overview-card">
+                    <span>PLAYERS</span>
+                    <strong>09</strong>
+                    <small>Registered</small>
+                </div>
+
+                <div class="overview-card">
+                    <span>HOME</span>
+                    <strong>Civil FC</strong>
+                    <small>Always</small>
+                </div>
+
+                <div class="overview-card">
+                    <span>STATUS</span>
+                    <strong class="online-status">
+                        ● Online
+                    </strong>
+                    <small>Dashboard</small>
+                </div>
+
+            </div>
+
+
+            <!-- MATCH MANAGEMENT -->
+
+            <section id="adminMatch" class="admin-section">
+
+                <div class="admin-section-title">
+
+                    <div>
+                        <span class="section-label">
+                            MATCH MANAGEMENT
+                        </span>
+
+                        <h3>Update Match Information</h3>
+                    </div>
+
+                    <span class="admin-status">
+                        Editable
+                    </span>
+
+                </div>
+
+                <form id="matchForm" class="admin-form">
+
+                    <div class="form-field">
+
+                        <label>Home Team</label>
+
+                        <input
+                            type="text"
+                            value="Civil FC"
+                            disabled
+                        >
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Opponent</label>
+
+                        <input
+                            type="text"
+                            id="opponentInput"
+                            placeholder="Opponent team"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Match Date</label>
+
+                        <input
+                            type="date"
+                            id="dateInput"
+                        >
+
+                    </div>
+
+                    <div class="form-field">
+
+                        <label>Match Time</label>
+
+                        <input
+                            type="time"
+                            id="timeInput"
+                        >
+
+                    </div>
+
+                    <div class="form-field full">
+
+                        <label>Venue</label>
+
+                        <input
+                            type="text"
+                            id="venueInput"
+                            placeholder="Match venue"
+                        >
+
+                    </div>
+
+                    <div class="form-actions">
+
+                        <button class="primary-btn">
+                            Save Match Information
+                        </button>
+
+                        <span id="saveMessage"></span>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- NOTICE MANAGEMENT -->
+
+            <section id="adminNotice" class="admin-section">
+
+                <div class="admin-section-title">
+
+                    <div>
+                        <span class="section-label">
+                            NOTICE MANAGEMENT
+                        </span>
+
+                        <h3>Add New Notice</h3>
+                    </div>
+
+                </div>
+
+                <form id="noticeForm" class="admin-form">
+
+                    <div class="form-field full">
+
+                        <label>Notice Title</label>
+
+                        <input
+                            type="text"
+                            id="noticeTitle"
+                            placeholder="Notice title"
+                            required
+                        >
+
+                    </div>
+
+                    <div class="form-field full">
+
+                        <label>Notice Message</label>
+
+                        <textarea
+                            id="noticeText"
+                            placeholder="Write your notice..."
+                            rows="5"
+                            required
+                        ></textarea>
+
+                    </div>
+
+                    <div class="form-actions">
+
+                        <button class="primary-btn">
+                            Publish Notice
+                        </button>
+
+                        <span id="noticeMessage"></span>
+
+                    </div>
+
+                </form>
+
+                <div id="adminNoticeList" class="admin-notice-list"></div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================= PLAYER MODAL ================= -->
+
+<div id="playerModal" class="modal">
+
+    <div class="modal-box player-modal-box">
+
+        <button class="modal-close" data-close="playerModal">
+            ×
+        </button>
+
+        <div id="playerModalContent"></div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
