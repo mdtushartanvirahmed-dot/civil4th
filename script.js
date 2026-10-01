@@ -1,251 +1,389 @@
-/* =====================================================
-   CIVIL FC WEBSITE
-   ===================================================== */
+// ======================================================
+// FIREBASE
+// ======================================================
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+
+import {
+    getAuth,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 
 
-/* ================= PLAYER DATA ================= */
+// ======================================================
+// FIREBASE CONFIG
+// ======================================================
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAZgHHlMKPfeNJjayusHw_1HFkfdzYrfTI",
+    authDomain: "cvil-fc.firebaseapp.com",
+    projectId: "cvil-fc",
+    storageBucket: "cvil-fc.firebasestorage.app",
+    messagingSenderId: "700492123659",
+    appId: "1:700492123659:web:b604125d9ddc56fe86810e",
+    measurementId: "G-7W7329DRBG"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+
+// ======================================================
+// PLAYERS
+// ======================================================
 
 const players = [
-
     {
         name: "Fahim",
         position: "CM",
-        role: "Midfielder",
-        number: "11"
+        number: "11",
+        role: "Midfielder"
     },
-
     {
         name: "Liyon",
         position: "RW",
-        role: "Winger",
-        number: "09"
+        number: "09",
+        role: "Right Winger"
     },
-
     {
         name: "Siam",
         position: "GK",
-        role: "Goalkeeper",
-        number: "67"
+        number: "67",
+        role: "Goalkeeper"
     },
-
     {
         name: "Prince",
         position: "GK",
-        role: "Goalkeeper",
-        number: "23"
+        number: "23",
+        role: "Goalkeeper"
     },
-
     {
         name: "Nadim",
         position: "CB",
-        role: "Defender",
-        number: "05"
+        number: "05",
+        role: "Centre Back"
     },
-
     {
-        name: "Sohag",
-        position: "TM",
-        role: "Team Member",
-        number: "06"
+        name: "Sohag TM",
+        position: "CM",
+        number: "06",
+        role: "Midfielder"
     },
-
     {
         name: "Tanvir",
         position: "CM",
-        role: "Midfielder",
         number: "10",
-        captain: true
+        role: "Captain"
     },
-
     {
         name: "Jihad",
         position: "ST",
-        role: "Forward",
-        number: "07"
+        number: "07",
+        role: "Striker"
     },
-
     {
         name: "Rezaul",
         position: "LB",
-        role: "Defender",
-        number: "08"
+        number: "08",
+        role: "Left Back"
     }
-
 ];
 
 
-/* ================= DEFAULT MATCH ================= */
+// ======================================================
+// DEFAULT MATCH
+// ======================================================
 
 const defaultMatch = {
-
-    opponent: "Opponent",
-
-    date: "",
-
-    time: "",
-
-    venue: "Shymoli"
-
+    opponent: "Coming Soon",
+    date: "2026-10-10",
+    time: "16:00",
+    venue: "Shymoli Ideal Polytechnic Institute"
 };
 
-
 let match =
-    JSON.parse(
-        localStorage.getItem("civilFCMatch")
-    ) || defaultMatch;
+    JSON.parse(localStorage.getItem("civilFCMatch")) ||
+    defaultMatch;
 
 
-/* ================= DEFAULT NOTICES ================= */
+// ======================================================
+// DEFAULT NOTICES
+// ======================================================
 
 const defaultNotices = [
-
     {
+        id: 1,
         title: "Welcome to Civil FC",
-        text: "Welcome to the official Civil FC website.",
-        date: "Welcome"
+        text: "Welcome to the official Civil FC platform of Shymoli Ideal Polytechnic Institute.",
+        date: "2026-10-01"
     },
-
     {
-        title: "Team Update",
-        text: "Civil FC team information is now available.",
-        date: "Team"
+        id: 2,
+        title: "Team Training",
+        text: "Players are requested to stay prepared for upcoming football activities.",
+        date: "2026-10-01"
+    },
+    {
+        id: 3,
+        title: "Stay Connected",
+        text: "Check this website regularly for match and team updates.",
+        date: "2026-10-01"
     }
-
 ];
 
-
 let notices =
-    JSON.parse(
-        localStorage.getItem("civilFCNotices")
-    ) || defaultNotices;
+    JSON.parse(localStorage.getItem("civilFCNotices")) ||
+    defaultNotices;
 
 
-/* =====================================================
-   LOGIN
-   ===================================================== */
+// ======================================================
+// ELEMENTS
+// ======================================================
 
-const loginForm =
-    document.getElementById("loginForm");
+const loginScreen = document.getElementById("loginScreen");
+const website = document.getElementById("website");
 
-
-loginForm.addEventListener(
-    "submit",
-    function(event) {
-
-        event.preventDefault();
-
-        const username =
-            document.getElementById("username").value.trim();
-
-        const password =
-            document.getElementById("password").value;
-
-        const error =
-            document.getElementById("loginError");
+const loginForm = document.getElementById("loginForm");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
+const loginError = document.getElementById("loginError");
+const signupBtn = document.getElementById("signupBtn");
 
 
-        if (
-            username === "tanvir" &&
-            password === "tanvir"
-        ) {
+// ======================================================
+// SHOW WEBSITE
+// ======================================================
 
-            localStorage.setItem(
-                "civilFCLoggedIn",
-                "true"
-            );
+function showWebsite() {
+    loginScreen.classList.add("hidden");
+    website.classList.remove("hidden");
 
-            error.textContent = "";
+    renderPlayers();
+    renderMatch();
+    renderNotices();
+}
 
-            showWebsite();
+
+// ======================================================
+// SHOW LOGIN
+// ======================================================
+
+function showLogin() {
+    website.classList.add("hidden");
+    loginScreen.classList.remove("hidden");
+}
+
+
+// ======================================================
+// FIREBASE AUTH STATE
+// ======================================================
+
+onAuthStateChanged(auth, (user) => {
+
+    if (user) {
+        console.log("Logged in:", user.email);
+        showWebsite();
+    } else {
+        showLogin();
+    }
+
+});
+
+
+// ======================================================
+// LOGIN
+// ======================================================
+
+loginForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
+
+    loginError.textContent = "";
+    loginError.style.color = "#ff7070";
+
+    try {
+
+        await signInWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        if (error.code === "auth/invalid-credential") {
+
+            loginError.textContent =
+                "Incorrect email or password.";
+
+        } else if (error.code === "auth/invalid-email") {
+
+            loginError.textContent =
+                "Please enter a valid email.";
 
         } else {
 
-            error.textContent =
-                "Incorrect username or password.";
+            loginError.textContent =
+                "Login failed. Please try again.";
 
         }
 
     }
-);
+
+});
 
 
-/* ================= SHOW WEBSITE ================= */
+// ======================================================
+// CREATE ACCOUNT
+// ======================================================
 
-function showWebsite() {
+signupBtn.addEventListener("click", async () => {
 
-    document
-        .getElementById("loginScreen")
-        .classList.add("hidden");
+    const email = emailInput.value.trim();
+    const password = passwordInput.value;
 
-    document
-        .getElementById("website")
-        .classList.remove("hidden");
+    loginError.style.color = "#ff7070";
 
-    loadMatch();
+    if (!email) {
 
-    renderPlayers();
+        loginError.textContent =
+            "Enter your email first.";
 
-    displayNotices();
+        return;
+    }
 
+    if (!password) {
+
+        loginError.textContent =
+            "Enter a password first.";
+
+        return;
+    }
+
+    if (password.length < 6) {
+
+        loginError.textContent =
+            "Password must be at least 6 characters.";
+
+        return;
+    }
+
+    try {
+
+        await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+        );
+
+        loginError.style.color = "var(--green)";
+
+        loginError.textContent =
+            "Account created successfully!";
+
+    } catch (error) {
+
+        console.error(error);
+
+        if (error.code === "auth/email-already-in-use") {
+
+            loginError.textContent =
+                "This email is already registered.";
+
+        } else if (error.code === "auth/invalid-email") {
+
+            loginError.textContent =
+                "Invalid email address.";
+
+        } else {
+
+            loginError.textContent =
+                "Could not create account.";
+
+        }
+
+    }
+
+});
+
+
+// ======================================================
+// LOGOUT
+// ======================================================
+
+function createLogoutButton() {
+
+    const nav = document.querySelector(".navbar nav");
+
+    if (!nav) return;
+
+    if (document.getElementById("logoutBtn")) return;
+
+    const logoutBtn = document.createElement("button");
+
+    logoutBtn.id = "logoutBtn";
+    logoutBtn.className = "admin-nav-btn";
+    logoutBtn.textContent = "Logout";
+
+    logoutBtn.addEventListener("click", async () => {
+
+        try {
+            await signOut(auth);
+        } catch (error) {
+            console.error(error);
+        }
+
+    });
+
+    nav.insertBefore(
+        logoutBtn,
+        nav.querySelector("#adminOpenBtn")
+    );
 }
 
-
-/* ================= INITIAL LOGIN CHECK ================= */
-
-if (
-    localStorage.getItem("civilFCLoggedIn")
-    === "true"
-) {
-
-    showWebsite();
-
-}
+createLogoutButton();
 
 
-/* =====================================================
-   PLAYER SYSTEM
-   ===================================================== */
+// ======================================================
+// PLAYERS
+// ======================================================
 
-function renderPlayers(search = "") {
-
-    const grid =
-        document.getElementById("playerGrid");
-
-    const query =
-        search.toLowerCase().trim();
+const playerGrid =
+    document.getElementById("playerGrid");
 
 
-    const filtered =
+function renderPlayers(searchTerm = "") {
+
+    if (!playerGrid) return;
+
+    playerGrid.innerHTML = "";
+
+    const search =
+        searchTerm.toLowerCase().trim();
+
+    const filteredPlayers =
         players.filter(player =>
 
-            player.name
-                .toLowerCase()
-                .includes(query)
-
-            ||
-
-            player.position
-                .toLowerCase()
-                .includes(query)
-
-            ||
-
-            player.role
-                .toLowerCase()
-                .includes(query)
+            player.name.toLowerCase().includes(search) ||
+            player.position.toLowerCase().includes(search) ||
+            player.role.toLowerCase().includes(search)
 
         );
 
 
-    grid.innerHTML = "";
+    if (filteredPlayers.length === 0) {
 
-
-    if (!filtered.length) {
-
-        grid.innerHTML = `
-            <div class="notice-card">
-                <h3>No player found</h3>
-                <p>Try another search.</p>
+        playerGrid.innerHTML = `
+            <div style="color:var(--muted); padding:20px;">
+                No player found.
             </div>
         `;
 
@@ -253,19 +391,17 @@ function renderPlayers(search = "") {
     }
 
 
-    filtered.forEach(player => {
+    filteredPlayers.forEach(player => {
 
         const card =
             document.createElement("div");
 
-        card.className =
-            "player-card";
-
+        card.className = "player-card";
 
         card.innerHTML = `
 
             <div class="player-number">
-                #${player.number}
+                ${player.number}
             </div>
 
             <h3>
@@ -281,118 +417,95 @@ function renderPlayers(search = "") {
             </div>
 
             ${
-                player.captain
+                player.name === "Tanvir"
                 ?
-                `<span class="captain-tag">
-                    ★ CAPTAIN
-                </span>`
+                `
+                <span class="captain-tag">
+                    CAPTAIN
+                </span>
+                `
                 :
                 ""
             }
 
         `;
 
+        card.addEventListener("click", () => {
+            openPlayerModal(player);
+        });
 
-        card.addEventListener(
-            "click",
-            () => openPlayerModal(player)
-        );
-
-
-        grid.appendChild(card);
+        playerGrid.appendChild(card);
 
     });
 
 }
 
 
-/* ================= PLAYER SEARCH ================= */
+// ======================================================
+// PLAYER SEARCH
+// ======================================================
 
-document
-    .getElementById("playerSearch")
-    .addEventListener(
+const playerSearch =
+    document.getElementById("playerSearch");
+
+if (playerSearch) {
+
+    playerSearch.addEventListener(
         "input",
-        function() {
+        function () {
 
             renderPlayers(this.value);
 
         }
     );
 
+}
 
-/* ================= PLAYER MODAL ================= */
+
+// ======================================================
+// PLAYER MODAL
+// ======================================================
+
+const playerModal =
+    document.getElementById("playerModal");
+
+const playerModalContent =
+    document.getElementById("playerModalContent");
+
 
 function openPlayerModal(player) {
 
-    const modal =
-        document.getElementById("playerModal");
+    if (!playerModal || !playerModalContent) return;
 
-    const content =
-        document.getElementById(
-            "playerModalContent"
-        );
-
-
-    content.innerHTML = `
+    playerModalContent.innerHTML = `
 
         <div class="modal-icon">
             ⚽
         </div>
 
-        <span class="section-label">
-            CIVIL FC PLAYER
-        </span>
-
-        <h2 style="
-            font-family:Outfit;
-            font-size:35px;
-            margin-top:8px;
-        ">
+        <h2>
             ${player.name}
         </h2>
 
-        <p style="
-            color:var(--muted);
-            margin-top:8px;
-        ">
-            ${player.position} • ${player.role}
+        <p style="color:var(--green); margin-top:8px;">
+            ${player.position}
         </p>
 
-        <div style="
-            margin-top:25px;
-            padding:20px;
-            border:1px solid var(--border);
-            border-radius:15px;
-            background:var(--card);
-        ">
+        <p style="color:var(--muted); margin-top:12px;">
+            Squad Number: ${player.number}
+        </p>
 
-            <strong>
-                Jersey Number
-            </strong>
-
-            <div style="
-                color:var(--green);
-                font-family:Outfit;
-                font-size:40px;
-                font-weight:900;
-                margin-top:5px;
-            ">
-                ${player.number}
-            </div>
-
-        </div>
+        <p style="color:var(--muted); margin-top:8px;">
+            Role: ${player.role}
+        </p>
 
         ${
-            player.captain
+            player.name === "Tanvir"
             ?
             `
-            <div style="
-                margin-top:15px;
-                color:var(--green);
-                font-weight:700;
-            ">
-                ★ Team Captain
-            </div>
+            <span class="captain-tag">
+                TEAM CAPTAIN
+            </span>
             `
             :
             ""
@@ -400,506 +513,249 @@ function openPlayerModal(player) {
 
     `;
 
-
-    modal.classList.remove("hidden");
+    playerModal.classList.remove("hidden");
 
 }
 
 
-/* =====================================================
-   MATCH SYSTEM
-   ===================================================== */
+// Close player modal
 
-function loadMatch() {
+document
+    .querySelectorAll('[data-close="playerModal"]')
+    .forEach(button => {
 
-    const opponent =
-        document.getElementById(
-            "opponentDisplay"
-        );
+        button.addEventListener("click", () => {
+
+            playerModal.classList.add("hidden");
+
+        });
+
+    });
+
+
+if (playerModal) {
+
+    playerModal.addEventListener("click", (event) => {
+
+        if (event.target === playerModal) {
+
+            playerModal.classList.add("hidden");
+
+        }
+
+    });
+
+}
+
+
+// ======================================================
+// MATCH
+// ======================================================
+
+function renderMatch() {
+
+    const opponentDisplay =
+        document.getElementById("opponentDisplay");
 
     const opponentName =
-        document.getElementById(
-            "opponentName"
-        );
+        document.getElementById("opponentName");
 
-    const date =
-        document.getElementById(
-            "matchDate"
-        );
+    const matchDate =
+        document.getElementById("matchDate");
 
-    const time =
-        document.getElementById(
-            "matchTime"
-        );
+    const matchTime =
+        document.getElementById("matchTime");
 
-    const venue =
-        document.getElementById(
-            "matchVenue"
-        );
+    const matchVenue =
+        document.getElementById("matchVenue");
 
 
-    opponent.textContent =
-        match.opponent || "Opponent";
+    if (opponentDisplay)
+        opponentDisplay.textContent = match.opponent;
 
-    opponentName.textContent =
-        match.opponent || "Opponent";
+    if (opponentName)
+        opponentName.textContent = match.opponent;
 
+    if (matchDate)
+        matchDate.textContent = formatDate(match.date);
 
-    if (match.date) {
+    if (matchTime)
+        matchTime.textContent = formatTime(match.time);
 
-        const dateObject =
-            new Date(
-                match.date + "T00:00:00"
-            );
-
-        date.textContent =
-            dateObject.toLocaleDateString(
-                "en-BD",
-                {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric"
-                }
-            );
-
-    } else {
-
-        date.textContent =
-            "Not set";
-
-    }
-
-
-    if (match.time) {
-
-        const timeObject =
-            new Date(
-                "2000-01-01T" +
-                match.time
-            );
-
-        time.textContent =
-            timeObject.toLocaleTimeString(
-                "en-US",
-                {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                }
-            );
-
-    } else {
-
-        time.textContent =
-            "Not set";
-
-    }
-
-
-    venue.textContent =
-        match.venue || "Not set";
-
-
-    loadAdminFields();
+    if (matchVenue)
+        matchVenue.textContent = match.venue;
 
 }
 
 
-/* ================= ADMIN MATCH FIELDS ================= */
+// ======================================================
+// DATE FORMAT
+// ======================================================
 
-function loadAdminFields() {
+function formatDate(date) {
 
-    const opponent =
-        document.getElementById(
-            "opponentInput"
-        );
+    if (!date) return "-";
 
-    const date =
-        document.getElementById(
-            "dateInput"
-        );
+    const d =
+        new Date(date + "T00:00:00");
 
-    const time =
-        document.getElementById(
-            "timeInput"
-        );
-
-    const venue =
-        document.getElementById(
-            "venueInput"
-        );
-
-
-    if (!opponent) return;
-
-
-    opponent.value =
-        match.opponent || "";
-
-    date.value =
-        match.date || "";
-
-    time.value =
-        match.time || "";
-
-    venue.value =
-        match.venue || "";
-
-}
-
-
-/* ================= SAVE MATCH ================= */
-
-document
-    .getElementById("matchForm")
-    .addEventListener(
-        "submit",
-        function(event) {
-
-            event.preventDefault();
-
-
-            match = {
-
-                opponent:
-                    document
-                    .getElementById(
-                        "opponentInput"
-                    )
-                    .value
-                    .trim(),
-
-                date:
-                    document
-                    .getElementById(
-                        "dateInput"
-                    )
-                    .value,
-
-                time:
-                    document
-                    .getElementById(
-                        "timeInput"
-                    )
-                    .value,
-
-                venue:
-                    document
-                    .getElementById(
-                        "venueInput"
-                    )
-                    .value
-                    .trim()
-
-            };
-
-
-            localStorage.setItem(
-                "civilFCMatch",
-                JSON.stringify(match)
-            );
-
-
-            loadMatch();
-
-
-            const message =
-                document.getElementById(
-                    "saveMessage"
-                );
-
-
-            message.textContent =
-                "✓ Match information saved";
-
-
-            setTimeout(
-                () => {
-                    message.textContent = "";
-                },
-                3000
-            );
-
+    return d.toLocaleDateString(
+        "en-US",
+        {
+            year: "numeric",
+            month: "short",
+            day: "numeric"
         }
     );
 
-
-/* =====================================================
-   NOTICE SYSTEM
-   ===================================================== */
-
-function displayNotices() {
-
-    const grid =
-        document.getElementById(
-            "noticeGrid"
-        );
-
-    const adminList =
-        document.getElementById(
-            "adminNoticeList"
-        );
+}
 
 
-    grid.innerHTML = "";
+// ======================================================
+// TIME FORMAT
+// ======================================================
 
-    adminList.innerHTML = "";
+function formatTime(time) {
+
+    if (!time) return "-";
+
+    const [hour, minute] =
+        time.split(":");
+
+    const d = new Date();
+
+    d.setHours(
+        Number(hour),
+        Number(minute)
+    );
+
+    return d.toLocaleTimeString(
+        "en-US",
+        {
+            hour: "numeric",
+            minute: "2-digit"
+        }
+    );
+
+}
 
 
-    if (!notices.length) {
+// ======================================================
+// NOTICES
+// ======================================================
 
-        grid.innerHTML = `
-            <div class="notice-card">
-                <h3>No notices</h3>
-                <p>No notices have been published yet.</p>
+function renderNotices() {
+
+    const noticeGrid =
+        document.getElementById("noticeGrid");
+
+    if (!noticeGrid) return;
+
+    noticeGrid.innerHTML = "";
+
+    notices.forEach(notice => {
+
+        const card =
+            document.createElement("div");
+
+        card.className = "notice-card";
+
+        card.innerHTML = `
+
+            <div class="notice-date">
+                ${formatDate(notice.date)}
             </div>
+
+            <h3>
+                ${notice.title}
+            </h3>
+
+            <p>
+                ${notice.text}
+            </p>
+
         `;
 
-    }
+        noticeGrid.appendChild(card);
 
+    });
 
-    notices.forEach(
-        (notice, index) => {
-
-            /* PUBLIC NOTICE */
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-            card.className =
-                "notice-card";
-
-
-            card.innerHTML = `
-
-                <span class="notice-date">
-                    ${notice.date}
-                </span>
-
-                <h3>
-                    ${notice.title}
-                </h3>
-
-                <p>
-                    ${notice.text}
-                </p>
-
-            `;
-
-
-            grid.appendChild(card);
-
-
-            /* ADMIN NOTICE */
-
-            const adminItem =
-                document.createElement(
-                    "div"
-                );
-
-            adminItem.className =
-                "admin-notice-item";
-
-
-            adminItem.innerHTML = `
-
-                <div>
-
-                    <strong>
-                        ${notice.title}
-                    </strong>
-
-                    <div style="
-                        color:var(--muted);
-                        font-size:11px;
-                        margin-top:5px;
-                    ">
-                        ${notice.text}
-                    </div>
-
-                </div>
-
-                <button
-                    class="delete-notice"
-                    onclick="deleteNotice(${index})"
-                >
-                    Delete
-                </button>
-
-            `;
-
-
-            adminList.appendChild(
-                adminItem
-            );
-
-        }
-    );
+    renderAdminNotices();
 
 }
 
 
-/* ================= ADD NOTICE ================= */
+// ======================================================
+// ADMIN LOGIN
+// ======================================================
 
-document
-    .getElementById("noticeForm")
-    .addEventListener(
-        "submit",
-        function(event) {
+const adminLoginModal =
+    document.getElementById("adminLoginModal");
 
-            event.preventDefault();
+const adminModal =
+    document.getElementById("adminModal");
 
-
-            const title =
-                document.getElementById(
-                    "noticeTitle"
-                ).value.trim();
+const adminOpenBtn =
+    document.getElementById("adminOpenBtn");
 
 
-            const text =
-                document.getElementById(
-                    "noticeText"
-                ).value.trim();
+if (adminOpenBtn) {
 
+    adminOpenBtn.addEventListener("click", () => {
 
-            notices.unshift({
+        adminLoginModal.classList.remove("hidden");
 
-                title: title,
-
-                text: text,
-
-                date: new Date()
-                    .toLocaleDateString(
-                        "en-BD",
-                        {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric"
-                        }
-                    )
-
-            });
-
-
-            localStorage.setItem(
-                "civilFCNotices",
-                JSON.stringify(notices)
-            );
-
-
-            displayNotices();
-
-
-            this.reset();
-
-
-            const message =
-                document.getElementById(
-                    "noticeMessage"
-                );
-
-
-            message.textContent =
-                "✓ Notice published";
-
-
-            setTimeout(
-                () => {
-                    message.textContent = "";
-                },
-                3000
-            );
-
-        }
-    );
-
-
-/* ================= DELETE NOTICE ================= */
-
-function deleteNotice(index) {
-
-    if (
-        !confirm(
-            "Delete this notice?"
-        )
-    ) {
-        return;
-    }
-
-
-    notices.splice(index, 1);
-
-
-    localStorage.setItem(
-        "civilFCNotices",
-        JSON.stringify(notices)
-    );
-
-
-    displayNotices();
+    });
 
 }
 
 
-/* =====================================================
-   ADMIN LOGIN
-   ===================================================== */
+// Close admin login
 
 document
-    .getElementById("adminOpenBtn")
-    .addEventListener(
-        "click",
-        function() {
+    .querySelectorAll('[data-close="adminLoginModal"]')
+    .forEach(button => {
 
-            document
-                .getElementById(
-                    "adminLoginModal"
-                )
-                .classList.remove("hidden");
+        button.addEventListener("click", () => {
 
-        }
-    );
+            adminLoginModal.classList.add("hidden");
+
+        });
+
+    });
 
 
-document
-    .getElementById("adminLoginForm")
-    .addEventListener(
+// ======================================================
+// ADMIN LOGIN FORM
+// ======================================================
+
+const adminLoginForm =
+    document.getElementById("adminLoginForm");
+
+
+if (adminLoginForm) {
+
+    adminLoginForm.addEventListener(
         "submit",
-        function(event) {
+        (event) => {
 
             event.preventDefault();
-
 
             const username =
-                document
-                .getElementById(
+                document.getElementById(
                     "adminUsername"
-                )
-                .value
-                .trim();
-
+                ).value.trim();
 
             const password =
-                document
-                .getElementById(
+                document.getElementById(
                     "adminPassword"
-                )
-                .value;
-
+                ).value;
 
             const error =
                 document.getElementById(
                     "adminLoginError"
                 );
 
-
-            /*
-                Current demo credentials.
-
-                Online version এ এগুলো
-                backend authentication-এ যাবে.
-            */
 
             if (
                 username === "admin" &&
@@ -911,30 +767,17 @@ document
                     "true"
                 );
 
-
                 error.textContent = "";
 
+                adminLoginModal.classList.add(
+                    "hidden"
+                );
 
-                document
-                    .getElementById(
-                        "adminLoginModal"
-                    )
-                    .classList.add("hidden");
+                adminModal.classList.remove(
+                    "hidden"
+                );
 
-
-                document
-                    .getElementById(
-                        "adminModal"
-                    )
-                    .classList.remove("hidden");
-
-
-                this.reset();
-
-
-                loadAdminFields();
-
-                displayNotices();
+                loadAdminData();
 
             } else {
 
@@ -946,204 +789,496 @@ document
         }
     );
 
+}
 
-/* =====================================================
-   ADMIN LOGOUT
-   ===================================================== */
+
+// ======================================================
+// ADMIN DASHBOARD CLOSE
+// ======================================================
 
 document
-    .getElementById("adminLogout")
-    .addEventListener(
-        "click",
-        function() {
+    .querySelectorAll('[data-close="adminModal"]')
+    .forEach(button => {
 
-            localStorage.removeItem(
-                "civilFCAdmin"
+        button.addEventListener("click", () => {
+
+            adminModal.classList.add("hidden");
+
+        });
+
+    });
+
+
+// ======================================================
+// ADMIN LOGOUT
+// ======================================================
+
+const adminLogout =
+    document.getElementById("adminLogout");
+
+
+if (adminLogout) {
+
+    adminLogout.addEventListener("click", () => {
+
+        localStorage.removeItem(
+            "civilFCAdmin"
+        );
+
+        adminModal.classList.add("hidden");
+
+    });
+
+}
+
+
+// ======================================================
+// LOAD ADMIN DATA
+// ======================================================
+
+function loadAdminData() {
+
+    const opponentInput =
+        document.getElementById("opponentInput");
+
+    const dateInput =
+        document.getElementById("dateInput");
+
+    const timeInput =
+        document.getElementById("timeInput");
+
+    const venueInput =
+        document.getElementById("venueInput");
+
+
+    if (opponentInput)
+        opponentInput.value = match.opponent;
+
+    if (dateInput)
+        dateInput.value = match.date;
+
+    if (timeInput)
+        timeInput.value = match.time;
+
+    if (venueInput)
+        venueInput.value = match.venue;
+
+    renderAdminNotices();
+
+}
+
+
+// ======================================================
+// SAVE MATCH
+// ======================================================
+
+const matchForm =
+    document.getElementById("matchForm");
+
+
+if (matchForm) {
+
+    matchForm.addEventListener(
+        "submit",
+        (event) => {
+
+            event.preventDefault();
+
+            match = {
+
+                opponent:
+                    document.getElementById(
+                        "opponentInput"
+                    ).value.trim(),
+
+                date:
+                    document.getElementById(
+                        "dateInput"
+                    ).value,
+
+                time:
+                    document.getElementById(
+                        "timeInput"
+                    ).value,
+
+                venue:
+                    document.getElementById(
+                        "venueInput"
+                    ).value.trim()
+
+            };
+
+
+            localStorage.setItem(
+                "civilFCMatch",
+                JSON.stringify(match)
             );
 
 
-            document
-                .getElementById(
-                    "adminModal"
-                )
-                .classList.add("hidden");
+            renderMatch();
+
+
+            const message =
+                document.getElementById(
+                    "saveMessage"
+                );
+
+            if (message) {
+
+                message.textContent =
+                    "Match saved successfully!";
+
+                setTimeout(() => {
+
+                    message.textContent = "";
+
+                }, 2500);
+
+            }
 
         }
-    );
-
-
-/* =====================================================
-   THEME
-   ===================================================== */
-
-const themeBtn =
-    document.getElementById(
-        "themeBtn"
-    );
-
-
-if (
-    localStorage.getItem(
-        "civilFCTheme"
-    ) === "light"
-) {
-
-    document.body.classList.add(
-        "light"
     );
 
 }
 
 
-themeBtn.addEventListener(
-    "click",
-    function() {
+// ======================================================
+// SAVE NOTICE
+// ======================================================
 
-        document.body.classList.toggle(
-            "light"
-        );
-
-
-        localStorage.setItem(
-            "civilFCTheme",
-
-            document.body.classList.contains(
-                "light"
-            )
-            ?
-            "light"
-            :
-            "dark"
-        );
-
-    }
-);
+const noticeForm =
+    document.getElementById("noticeForm");
 
 
-/* =====================================================
-   MOBILE MENU
-   ===================================================== */
+if (noticeForm) {
 
-const menuBtn =
-    document.getElementById(
-        "menuBtn"
-    );
+    noticeForm.addEventListener(
+        "submit",
+        (event) => {
 
-const navMenu =
-    document.getElementById(
-        "navMenu"
-    );
+            event.preventDefault();
 
+            const title =
+                document.getElementById(
+                    "noticeTitle"
+                ).value.trim();
 
-menuBtn.addEventListener(
-    "click",
-    function() {
-
-        navMenu.classList.toggle(
-            "open"
-        );
-
-    }
-);
+            const text =
+                document.getElementById(
+                    "noticeText"
+                ).value.trim();
 
 
-document
-    .querySelectorAll(
-        "#navMenu a"
-    )
-    .forEach(link => {
+            const newNotice = {
 
-        link.addEventListener(
-            "click",
-            () => {
-                navMenu.classList.remove(
-                    "open"
+                id: Date.now(),
+
+                title,
+
+                text,
+
+                date:
+                    new Date()
+                        .toISOString()
+                        .split("T")[0]
+
+            };
+
+
+            notices.unshift(newNotice);
+
+
+            localStorage.setItem(
+                "civilFCNotices",
+                JSON.stringify(notices)
+            );
+
+
+            renderNotices();
+
+
+            noticeForm.reset();
+
+
+            const message =
+                document.getElementById(
+                    "noticeMessage"
                 );
+
+
+            if (message) {
+
+                message.textContent =
+                    "Notice published successfully!";
+
+                setTimeout(() => {
+
+                    message.textContent = "";
+
+                }, 2500);
+
             }
+
+        }
+    );
+
+}
+
+
+// ======================================================
+// ADMIN NOTICE LIST
+// ======================================================
+
+function renderAdminNotices() {
+
+    const list =
+        document.getElementById(
+            "adminNoticeList"
         );
+
+    if (!list) return;
+
+    list.innerHTML = "";
+
+
+    notices.forEach(notice => {
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            "admin-notice-item";
+
+
+        item.innerHTML = `
+
+            <div>
+
+                <strong>
+                    ${notice.title}
+                </strong>
+
+                <p style="
+                    color:var(--muted);
+                    font-size:12px;
+                    margin-top:5px;
+                ">
+                    ${notice.text}
+                </p>
+
+            </div>
+
+            <button
+                class="delete-notice"
+                data-id="${notice.id}"
+            >
+                Delete
+            </button>
+
+        `;
+
+
+        list.appendChild(item);
 
     });
 
 
-/* =====================================================
-   MODAL CLOSE
-   ===================================================== */
+    document
+        .querySelectorAll(".delete-notice")
+        .forEach(button => {
 
-document
-    .querySelectorAll(
-        "[data-close]"
-    )
-    .forEach(button => {
+            button.addEventListener(
+                "click",
+                function () {
 
-        button.addEventListener(
-            "click",
-            function() {
-
-                const modalId =
-                    this.dataset.close;
+                    const id =
+                        Number(
+                            this.dataset.id
+                        );
 
 
-                document
-                    .getElementById(
-                        modalId
-                    )
-                    .classList.add(
-                        "hidden"
+                    notices =
+                        notices.filter(
+                            notice =>
+                                notice.id !== id
+                        );
+
+
+                    localStorage.setItem(
+                        "civilFCNotices",
+                        JSON.stringify(notices)
                     );
 
-            }
-        );
 
-    });
+                    renderNotices();
+
+                }
+            );
+
+        });
+
+}
 
 
-/* ================= CLOSE ON BACKDROP ================= */
+// ======================================================
+// THEME
+// ======================================================
 
-document
-    .querySelectorAll(".modal")
-    .forEach(modal => {
+const themeBtn =
+    document.getElementById("themeBtn");
 
-        modal.addEventListener(
-            "click",
-            function(event) {
 
-                if (
-                    event.target === this
-                ) {
+const savedTheme =
+    localStorage.getItem("civilFCTheme");
 
-                    this.classList.add(
-                        "hidden"
+
+if (
+    savedTheme === "light" &&
+    themeBtn
+) {
+
+    document.body.classList.add("light");
+
+    themeBtn.textContent = "🌙";
+
+}
+
+
+if (themeBtn) {
+
+    themeBtn.addEventListener(
+        "click",
+        () => {
+
+            document.body.classList.toggle(
+                "light"
+            );
+
+
+            const isLight =
+                document.body.classList.contains(
+                    "light"
+                );
+
+
+            localStorage.setItem(
+                "civilFCTheme",
+                isLight
+                    ? "light"
+                    : "dark"
+            );
+
+
+            themeBtn.textContent =
+                isLight
+                    ? "🌙"
+                    : "☀";
+
+        }
+    );
+
+}
+
+
+// ======================================================
+// MOBILE MENU
+// ======================================================
+
+const menuBtn =
+    document.getElementById("menuBtn");
+
+const mainNav =
+    document.querySelector(".navbar nav");
+
+
+if (menuBtn && mainNav) {
+
+    menuBtn.addEventListener(
+        "click",
+        () => {
+
+            mainNav.classList.toggle("open");
+
+        }
+    );
+
+
+    mainNav
+        .querySelectorAll("a")
+        .forEach(link => {
+
+            link.addEventListener(
+                "click",
+                () => {
+
+                    mainNav.classList.remove(
+                        "open"
                     );
 
                 }
+            );
+
+        });
+
+}
+
+
+// ======================================================
+// CLOSE MODALS WHEN CLICKING OUTSIDE
+// ======================================================
+
+if (adminLoginModal) {
+
+    adminLoginModal.addEventListener(
+        "click",
+        (event) => {
+
+            if (
+                event.target ===
+                adminLoginModal
+            ) {
+
+                adminLoginModal.classList.add(
+                    "hidden"
+                );
 
             }
-        );
-
-    });
-
-
-/* ================= ESC KEY ================= */
-
-document.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (event.key === "Escape") {
-
-            document
-                .querySelectorAll(
-                    ".modal"
-                )
-                .forEach(modal => {
-
-                    modal.classList.add(
-                        "hidden"
-                    );
-
-                });
 
         }
+    );
 
-    }
-);
+}
+
+
+if (adminModal) {
+
+    adminModal.addEventListener(
+        "click",
+        (event) => {
+
+            if (
+                event.target ===
+                adminModal
+            ) {
+
+                adminModal.classList.add(
+                    "hidden"
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+// ======================================================
+// INITIAL RENDER
+// ======================================================
+
+renderPlayers();
+renderMatch();
+renderNotices();
+
+console.log("Civil FC script loaded successfully.");
