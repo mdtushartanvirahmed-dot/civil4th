@@ -1,6 +1,7 @@
 /* =========================================================
    CIVIL FC | SHYMOLI IDEAL POLYTECHNIC INSTITUTE
    Complete JavaScript
+   Firebase Auth + Firestore Realtime Match & Notice
 ========================================================= */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
@@ -14,6 +15,16 @@ import {
     setPersistence,
     inMemoryPersistence
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
+
+import {
+    getFirestore,
+    doc,
+    setDoc,
+    collection,
+    addDoc,
+    deleteDoc,
+    onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
 
 
 /* =========================================================
@@ -32,11 +43,13 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 setPersistence(auth, inMemoryPersistence)
     .catch((error) => {
         console.error("Auth persistence error:", error);
     });
+
 
 /* =========================================================
    PLAYERS
@@ -120,59 +133,14 @@ const defaultMatch = {
     venue: "Shymoli Ideal Polytechnic Institute"
 };
 
-let match = getStorage("civilFCMatch", defaultMatch);
+let match = { ...defaultMatch };
 
 
 /* =========================================================
    NOTICE DATA
 ========================================================= */
 
-const defaultNotices = [
-    {
-        id: 1,
-        title: "Welcome to Civil FC",
-        date: "2026-10-01",
-        text: "Welcome to the official Civil FC website."
-    },
-    {
-        id: 2,
-        title: "Next Match",
-        date: "2026-10-01",
-        text: "Our next match information will be updated soon."
-    },
-    {
-        id: 3,
-        title: "Team Update",
-        date: "2026-10-01",
-        text: "Stay connected with Civil FC for the latest updates."
-    }
-];
-
-let notices = getStorage("civilFCNotices", defaultNotices);
-
-
-/* =========================================================
-   SAFE LOCAL STORAGE
-========================================================= */
-
-function getStorage(key, fallback) {
-
-    try {
-
-        const saved = localStorage.getItem(key);
-
-        if (saved) {
-            return JSON.parse(saved);
-        }
-
-    } catch (error) {
-
-        console.error("Storage error:", error);
-
-    }
-
-    return fallback;
-}
+let notices = [];
 
 
 /* =========================================================
@@ -256,7 +224,6 @@ function showWebsite() {
     if (website) {
         website.classList.remove("hidden");
     }
-
 }
 
 
@@ -269,7 +236,6 @@ function showLogin() {
     if (website) {
         website.classList.add("hidden");
     }
-
 }
 
 
@@ -282,6 +248,9 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
 
         showWebsite();
+
+        listenToMatch();
+        listenToNotices();
 
     } else {
 
@@ -313,7 +282,6 @@ if (loginForm) {
                 "Please enter email and password.";
 
             return;
-
         }
 
         try {
@@ -359,7 +327,6 @@ if (signupBtn) {
                 "Enter email and password first.";
 
             return;
-
         }
 
         if (password.length < 6) {
@@ -368,7 +335,6 @@ if (signupBtn) {
                 "Password must be at least 6 characters.";
 
             return;
-
         }
 
         try {
@@ -427,7 +393,6 @@ function getAuthError(error) {
 
         default:
             return error.message || "Something went wrong.";
-
     }
 
 }
@@ -490,7 +455,6 @@ function renderPlayers(searchTerm = "") {
         `;
 
         return;
-
     }
 
     filteredPlayers.forEach((player) => {
@@ -593,6 +557,7 @@ if (playerModalClose) {
 
 }
 
+
 if (playerModal) {
 
     playerModal.addEventListener("click", (event) => {
@@ -609,7 +574,7 @@ if (playerModal) {
 
 
 /* =========================================================
-   MATCH
+   MATCH FORMAT
 ========================================================= */
 
 function formatDate(dateString) {
@@ -663,6 +628,10 @@ function formatTime(timeString) {
 }
 
 
+/* =========================================================
+   RENDER MATCH
+========================================================= */
+
 function renderMatch() {
 
     if (opponentDisplay) {
@@ -697,7 +666,95 @@ function renderMatch() {
 
 
 /* =========================================================
-   NOTICES
+   FIRESTORE - MATCH REALTIME
+========================================================= */
+
+function listenToMatch() {
+
+    const matchRef =
+        doc(db, "civilFC", "match");
+
+    onSnapshot(
+        matchRef,
+        (snapshot) => {
+
+            if (snapshot.exists()) {
+
+                match = snapshot.data();
+
+            } else {
+
+                match = {
+                    ...defaultMatch
+                };
+
+            }
+
+            renderMatch();
+            loadAdminData();
+
+        },
+        (error) => {
+
+            console.error(
+                "Match Firestore error:",
+                error
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   FIRESTORE - NOTICES REALTIME
+========================================================= */
+
+function listenToNotices() {
+
+    const noticesRef =
+        collection(db, "notices");
+
+    onSnapshot(
+        noticesRef,
+        (snapshot) => {
+
+            notices = snapshot.docs.map(
+                (docSnapshot) => ({
+
+                    id: docSnapshot.id,
+
+                    ...docSnapshot.data()
+
+                })
+            );
+
+            notices.sort(
+                (a, b) =>
+                    new Date(b.date) -
+                    new Date(a.date)
+            );
+
+            renderNotices();
+            renderAdminNotices();
+
+        },
+        (error) => {
+
+            console.error(
+                "Notice Firestore error:",
+                error
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   NOTICE RENDER
 ========================================================= */
 
 function renderNotices() {
@@ -715,20 +772,22 @@ function renderNotices() {
         `;
 
         return;
-
     }
 
-    const sortedNotices = [...notices].sort(
-        (a, b) =>
-            new Date(b.date) -
-            new Date(a.date)
-    );
+    const sortedNotices =
+        [...notices].sort(
+            (a, b) =>
+                new Date(b.date) -
+                new Date(a.date)
+        );
 
     sortedNotices.forEach((notice) => {
 
-        const card = document.createElement("div");
+        const card =
+            document.createElement("div");
 
-        card.className = "notice-card";
+        card.className =
+            "notice-card";
 
         card.innerHTML = `
             <div class="notice-date">
@@ -777,20 +836,22 @@ function renderAdminNotices() {
         `;
 
         return;
-
     }
 
-    const sortedNotices = [...notices].sort(
-        (a, b) =>
-            new Date(b.date) -
-            new Date(a.date)
-    );
+    const sortedNotices =
+        [...notices].sort(
+            (a, b) =>
+                new Date(b.date) -
+                new Date(a.date)
+        );
 
     sortedNotices.forEach((notice) => {
 
-        const item = document.createElement("div");
+        const item =
+            document.createElement("div");
 
-        item.className = "admin-notice-item";
+        item.className =
+            "admin-notice-item";
 
         item.innerHTML = `
             <div>
@@ -852,7 +913,9 @@ if (adminOpenBtn) {
         adminLoginModal.classList.remove("hidden");
 
         if (adminLoginError) {
+
             adminLoginError.textContent = "";
+
         }
 
     });
@@ -873,6 +936,7 @@ if (adminLoginClose) {
     });
 
 }
+
 
 if (adminLoginModal) {
 
@@ -895,54 +959,57 @@ if (adminLoginModal) {
 
 if (adminLoginForm) {
 
-    adminLoginForm.addEventListener("submit", (event) => {
+    adminLoginForm.addEventListener(
+        "submit",
+        (event) => {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        const username =
-            adminUsername.value.trim();
+            const username =
+                adminUsername.value.trim();
 
-        const password =
-            adminPassword.value;
+            const password =
+                adminPassword.value;
 
-        adminLoginError.textContent = "";
+            adminLoginError.textContent = "";
 
-        /*
-         * DEMO ADMIN LOGIN
-         * Username: admin
-         * Password: civilfc
-         */
+            /*
+             * DEMO ADMIN LOGIN
+             * Username: admin
+             * Password: civilfc
+             */
 
-        if (
-            username === "admin" &&
-            password === "civilfc"
-        ) {
+            if (
+                username === "admin" &&
+                password === "civilfc"
+            ) {
 
-            localStorage.setItem(
-                "civilFCAdmin",
-                "true"
-            );
+                localStorage.setItem(
+                    "civilFCAdmin",
+                    "true"
+                );
 
-            adminLoginForm.reset();
+                adminLoginForm.reset();
 
-            adminLoginModal.classList.add(
-                "hidden"
-            );
+                adminLoginModal.classList.add(
+                    "hidden"
+                );
 
-            adminModal.classList.remove(
-                "hidden"
-            );
+                adminModal.classList.remove(
+                    "hidden"
+                );
 
-            loadAdminData();
+                loadAdminData();
 
-        } else {
+            } else {
 
-            adminLoginError.textContent =
-                "Invalid admin username or password.";
+                adminLoginError.textContent =
+                    "Invalid admin username or password.";
+
+            }
 
         }
-
-    });
+    );
 
 }
 
@@ -960,6 +1027,7 @@ if (adminClose) {
     });
 
 }
+
 
 if (adminModal) {
 
@@ -1035,136 +1103,172 @@ function loadAdminData() {
 
 
 /* =========================================================
-   SAVE MATCH
+   SAVE MATCH - FIRESTORE
 ========================================================= */
 
 if (matchForm) {
 
-    matchForm.addEventListener("submit", (event) => {
+    matchForm.addEventListener(
+        "submit",
+        async (event) => {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        match = {
+            const updatedMatch = {
 
-            opponent:
-                opponentInput.value.trim() ||
-                "Coming Soon",
+                opponent:
+                    opponentInput.value.trim() ||
+                    "Coming Soon",
 
-            date:
-                dateInput.value ||
-                defaultMatch.date,
+                date:
+                    dateInput.value || "",
 
-            time:
-                timeInput.value ||
-                defaultMatch.time,
+                time:
+                    timeInput.value || "",
 
-            venue:
-                venueInput.value.trim() ||
-                "TBA"
+                venue:
+                    venueInput.value.trim() ||
+                    "TBA"
 
-        };
+            };
 
-        localStorage.setItem(
-            "civilFCMatch",
-            JSON.stringify(match)
-        );
+            try {
 
-        renderMatch();
+                await setDoc(
+                    doc(db, "civilFC", "match"),
+                    updatedMatch
+                );
 
-        if (saveMessage) {
+                match = {
+                    ...updatedMatch
+                };
 
-            saveMessage.textContent =
-                "Match information saved successfully!";
+                renderMatch();
 
-            setTimeout(() => {
+                loadAdminData();
 
-                saveMessage.textContent = "";
+                if (saveMessage) {
 
-            }, 3000);
+                    saveMessage.textContent =
+                        "Match information updated for everyone!";
+
+                    setTimeout(() => {
+
+                        saveMessage.textContent = "";
+
+                    }, 3000);
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "Match save error:",
+                    error
+                );
+
+                if (saveMessage) {
+
+                    saveMessage.textContent =
+                        "Failed to update match.";
+
+                }
+
+            }
 
         }
-
-    });
+    );
 
 }
 
 
 /* =========================================================
-   ADD NOTICE
+   ADD NOTICE - FIRESTORE
 ========================================================= */
 
 if (noticeForm) {
 
-    noticeForm.addEventListener("submit", (event) => {
+    noticeForm.addEventListener(
+        "submit",
+        async (event) => {
 
-        event.preventDefault();
+            event.preventDefault();
 
-        const title =
-            noticeTitle.value.trim();
+            const title =
+                noticeTitle.value.trim();
 
-        const date =
-            noticeDate.value ||
-            new Date().toISOString().split("T")[0];
+            const date =
+                noticeDate.value ||
+                new Date()
+                    .toISOString()
+                    .split("T")[0];
 
-        const text =
-            noticeText.value.trim();
+            const text =
+                noticeText.value.trim();
 
-        if (!title || !text) {
+            if (!title || !text) {
 
-            noticeMessage.textContent =
-                "Please fill in all required fields.";
+                noticeMessage.textContent =
+                    "Please fill in all required fields.";
 
-            return;
+                return;
+            }
+
+            const newNotice = {
+
+                title: title,
+
+                date: date,
+
+                text: text
+
+            };
+
+            try {
+
+                await addDoc(
+                    collection(db, "notices"),
+                    newNotice
+                );
+
+                noticeForm.reset();
+
+                noticeMessage.textContent =
+                    "Notice published for everyone!";
+
+                setTimeout(() => {
+
+                    noticeMessage.textContent = "";
+
+                }, 3000);
+
+            } catch (error) {
+
+                console.error(
+                    "Notice save error:",
+                    error
+                );
+
+                noticeMessage.textContent =
+                    "Failed to publish notice.";
+
+            }
 
         }
-
-        const newNotice = {
-
-            id: Date.now(),
-
-            title: title,
-
-            date: date,
-
-            text: text
-
-        };
-
-        notices.unshift(newNotice);
-
-        localStorage.setItem(
-            "civilFCNotices",
-            JSON.stringify(notices)
-        );
-
-        renderNotices();
-        renderAdminNotices();
-
-        noticeForm.reset();
-
-        noticeMessage.textContent =
-            "Notice added successfully!";
-
-        setTimeout(() => {
-
-            noticeMessage.textContent = "";
-
-        }, 3000);
-
-    });
+    );
 
 }
 
 
 /* =========================================================
-   DELETE NOTICE
+   DELETE NOTICE - FIRESTORE
 ========================================================= */
 
 if (adminNoticeList) {
 
     adminNoticeList.addEventListener(
         "click",
-        (event) => {
+        async (event) => {
 
             const button =
                 event.target.closest(
@@ -1174,20 +1278,24 @@ if (adminNoticeList) {
             if (!button) return;
 
             const id =
-                Number(button.dataset.id);
+                button.dataset.id;
 
-            notices = notices.filter(
-                (notice) =>
-                    notice.id !== id
-            );
+            if (!id) return;
 
-            localStorage.setItem(
-                "civilFCNotices",
-                JSON.stringify(notices)
-            );
+            try {
 
-            renderNotices();
-            renderAdminNotices();
+                await deleteDoc(
+                    doc(db, "notices", id)
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "Notice delete error:",
+                    error
+                );
+
+            }
 
         }
     );
