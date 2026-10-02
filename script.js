@@ -158,12 +158,18 @@ const signupBtn = document.getElementById("signupBtn");
 // ======================================================
 
 function showWebsite() {
-    loginScreen.classList.add("hidden");
-    website.classList.remove("hidden");
+    const loginScreen = document.getElementById("loginScreen");
+    const website = document.getElementById("website");
 
-    renderPlayers();
-    renderMatch();
-    renderNotices();
+    if (loginScreen) {
+        loginScreen.classList.add("hidden");
+    }
+
+    if (website) {
+        website.classList.remove("hidden");
+    }
+
+    window.scrollTo(0, 0);
 }
 
 
