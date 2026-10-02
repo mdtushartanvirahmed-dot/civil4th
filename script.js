@@ -961,11 +961,11 @@ if (adminLoginForm) {
 
     adminLoginForm.addEventListener(
         "submit",
-        (event) => {
+        async (event) => {
 
             event.preventDefault();
 
-            const username =
+            const email =
                 adminUsername.value.trim();
 
             const password =
@@ -973,21 +973,39 @@ if (adminLoginForm) {
 
             adminLoginError.textContent = "";
 
-            /*
-             * DEMO ADMIN LOGIN
-             * Username: admin
-             * Password: civilfc
-             */
+            if (!email || !password) {
 
-            if (
-                username === "admin" &&
-                password === "civilfc"
-            ) {
+                adminLoginError.textContent =
+                    "Please enter email and password.";
 
-                localStorage.setItem(
-                    "civilFCAdmin",
-                    "true"
-                );
+                return;
+            }
+
+            try {
+
+                const userCredential =
+                    await signInWithEmailAndPassword(
+                        auth,
+                        email,
+                        password
+                    );
+
+                const user =
+                    userCredential.user;
+
+                // শুধুমাত্র তোমার Admin email অনুমোদিত
+                if (
+                    user.email !==
+                    "mdtushartanvirahmed@gmail.com"
+                ) {
+
+                    await signOut(auth);
+
+                    adminLoginError.textContent =
+                        "You are not authorized as admin.";
+
+                    return;
+                }
 
                 adminLoginForm.reset();
 
@@ -1001,10 +1019,15 @@ if (adminLoginForm) {
 
                 loadAdminData();
 
-            } else {
+            } catch (error) {
+
+                console.error(
+                    "Admin login error:",
+                    error
+                );
 
                 adminLoginError.textContent =
-                    "Invalid admin username or password.";
+                    "Invalid admin email or password.";
 
             }
 
