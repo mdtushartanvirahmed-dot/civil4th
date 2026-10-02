@@ -37,47 +37,73 @@
 
 <!-- ================= LOGIN SCREEN ================= -->
 
-<form id="loginForm">
+<!-- ================= LOGIN SCREEN ================= -->
 
-    <div class="input-group">
-        <label for="email">Email</label>
-        <input
-            type="email"
-            id="email"
-            placeholder="Enter email"
-            autocomplete="email"
-            required
+<div id="loginScreen">
+
+    <div class="login-box">
+
+        <div class="modal-icon">
+            ⚽
+        </div>
+
+        <h2>Civil FC Login</h2>
+
+        <p>Login to access the Civil FC website.</p>
+
+        <form id="loginForm">
+
+            <div class="input-group">
+                <label for="email">Email</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter email"
+                    autocomplete="email"
+                    required
+                >
+            </div>
+
+            <div class="input-group">
+                <label for="password">Password</label>
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter password"
+                    autocomplete="current-password"
+                    required
+                >
+            </div>
+
+            <button
+                class="primary-btn login-btn"
+                type="submit"
+            >
+                Login
+                <span>→</span>
+            </button>
+
+            <p
+                id="loginError"
+                class="login-error"
+            ></p>
+
+        </form>
+
+        <button
+            type="button"
+            id="signupBtn"
+            class="secondary-btn"
+            style="width:100%; margin-top:10px;"
         >
+            Create Account
+        </button>
+
     </div>
 
-    <div class="input-group">
-        <label for="password">Password</label>
-        <input
-            type="password"
-            id="password"
-            placeholder="Enter password"
-            autocomplete="current-password"
-            required
-        >
-    </div>
-
-    <button class="primary-btn login-btn" type="submit">
-        Login
-        <span>→</span>
-    </button>
-
-    <p id="loginError" class="login-error"></p>
-
-</form>
-
-<button
-    type="button"
-    id="signupBtn"
-    class="secondary-btn"
-    style="width:100%; margin-top:10px;"
->
-    Create Account
-</button>
+</div>
 <!-- ================= MAIN WEBSITE ================= -->
 
 <div id="website" class="hidden">
