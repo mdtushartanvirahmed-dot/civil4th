@@ -10,7 +10,9 @@ import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
     onAuthStateChanged,
-    signOut
+    signOut,
+    setPersistence,
+    inMemoryPersistence
 } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js";
 
 
@@ -31,6 +33,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
+setPersistence(auth, inMemoryPersistence)
+    .catch((error) => {
+        console.error("Auth persistence error:", error);
+    });
 
 /* =========================================================
    PLAYERS
