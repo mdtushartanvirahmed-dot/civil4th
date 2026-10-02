@@ -1526,3 +1526,33 @@ body.light .admin-dashboard {
         grid-template-columns: 1fr;
     }
 }
+#loginScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#loginScreen.hidden {
+    display: none !important;
+}
+
+.login-box {
+    width: 100%;
+    max-width: 420px;
+    padding: 32px;
+    border-radius: 20px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+}
+
+.login-box h2 {
+    margin-top: 15px;
+}
+
+.login-box > p {
+    color: var(--muted);
+    margin: 8px 0 24px;
+}
