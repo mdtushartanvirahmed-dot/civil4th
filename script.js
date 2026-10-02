@@ -1,6 +1,6 @@
 /* =========================================================
    CIVIL FC | SHYMOLI IDEAL POLYTECHNIC INSTITUTE
-   Firebase Auth + Players + Match + Notices + Admin
+   Complete JavaScript
 ========================================================= */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
@@ -15,7 +15,7 @@ import {
 
 
 /* =========================================================
-   FIREBASE CONFIG
+   FIREBASE
 ========================================================= */
 
 const firebaseConfig = {
@@ -104,7 +104,7 @@ const players = [
 
 
 /* =========================================================
-   DEFAULT MATCH
+   MATCH DATA
 ========================================================= */
 
 const defaultMatch = {
@@ -114,39 +114,59 @@ const defaultMatch = {
     venue: "Shymoli Ideal Polytechnic Institute"
 };
 
-let match =
-    JSON.parse(localStorage.getItem("civilFCMatch")) ||
-    defaultMatch;
+let match = getStorage("civilFCMatch", defaultMatch);
 
 
 /* =========================================================
-   DEFAULT NOTICES
+   NOTICE DATA
 ========================================================= */
 
 const defaultNotices = [
     {
-        id: Date.now() + 1,
+        id: 1,
         title: "Welcome to Civil FC",
         date: "2026-10-01",
         text: "Welcome to the official Civil FC website."
     },
     {
-        id: Date.now() + 2,
+        id: 2,
         title: "Next Match",
         date: "2026-10-01",
         text: "Our next match information will be updated soon."
     },
     {
-        id: Date.now() + 3,
+        id: 3,
         title: "Team Update",
         date: "2026-10-01",
         text: "Stay connected with Civil FC for the latest updates."
     }
 ];
 
-let notices =
-    JSON.parse(localStorage.getItem("civilFCNotices")) ||
-    defaultNotices;
+let notices = getStorage("civilFCNotices", defaultNotices);
+
+
+/* =========================================================
+   SAFE LOCAL STORAGE
+========================================================= */
+
+function getStorage(key, fallback) {
+
+    try {
+
+        const saved = localStorage.getItem(key);
+
+        if (saved) {
+            return JSON.parse(saved);
+        }
+
+    } catch (error) {
+
+        console.error("Storage error:", error);
+
+    }
+
+    return fallback;
+}
 
 
 /* =========================================================
@@ -174,7 +194,7 @@ const themeBtn = document.getElementById("themeBtn");
 const playerGrid = document.getElementById("playerGrid");
 const playerSearch = document.getElementById("playerSearch");
 
-// Player Modal
+// Player modal
 const playerModal = document.getElementById("playerModal");
 const playerModalClose = document.getElementById("playerModalClose");
 const playerModalContent = document.getElementById("playerModalContent");
@@ -190,72 +210,31 @@ const noticeGrid = document.getElementById("noticeGrid");
 
 // Admin
 const adminOpenBtn = document.getElementById("adminOpenBtn");
+const adminLoginModal = document.getElementById("adminLoginModal");
+const adminLoginClose = document.getElementById("adminLoginClose");
+const adminLoginForm = document.getElementById("adminLoginForm");
+const adminUsername = document.getElementById("adminUsername");
+const adminPassword = document.getElementById("adminPassword");
+const adminLoginError = document.getElementById("adminLoginError");
 
-const adminLoginModal =
-    document.getElementById("adminLoginModal");
+const adminModal = document.getElementById("adminModal");
+const adminClose = document.getElementById("adminClose");
+const adminLogout = document.getElementById("adminLogout");
+const adminNoticeCount = document.getElementById("adminNoticeCount");
 
-const adminLoginClose =
-    document.getElementById("adminLoginClose");
+const matchForm = document.getElementById("matchForm");
+const opponentInput = document.getElementById("opponentInput");
+const dateInput = document.getElementById("dateInput");
+const timeInput = document.getElementById("timeInput");
+const venueInput = document.getElementById("venueInput");
+const saveMessage = document.getElementById("saveMessage");
 
-const adminLoginForm =
-    document.getElementById("adminLoginForm");
-
-const adminUsername =
-    document.getElementById("adminUsername");
-
-const adminPassword =
-    document.getElementById("adminPassword");
-
-const adminLoginError =
-    document.getElementById("adminLoginError");
-
-const adminModal =
-    document.getElementById("adminModal");
-
-const adminClose =
-    document.getElementById("adminClose");
-
-const adminLogout =
-    document.getElementById("adminLogout");
-
-const adminNoticeCount =
-    document.getElementById("adminNoticeCount");
-
-const matchForm =
-    document.getElementById("matchForm");
-
-const opponentInput =
-    document.getElementById("opponentInput");
-
-const dateInput =
-    document.getElementById("dateInput");
-
-const timeInput =
-    document.getElementById("timeInput");
-
-const venueInput =
-    document.getElementById("venueInput");
-
-const saveMessage =
-    document.getElementById("saveMessage");
-
-const noticeForm =
-    document.getElementById("noticeForm");
-
-const noticeTitle =
-    document.getElementById("noticeTitle");
-
-const noticeDate =
-    document.getElementById("noticeDate");
-
-const noticeText =
-    document.getElementById("noticeText");
-
-const noticeMessage =
-    document.getElementById("noticeMessage");
-
-const adminNoticeList =
-    document.getElementById("adminNoticeList");
+const noticeForm = document.getElementById("noticeForm");
+const noticeTitle = document.getElementById("noticeTitle");
+const noticeDate = document.getElementById("noticeDate");
+const noticeText = document.getElementById("noticeText");
+const noticeMessage = document.getElementById("noticeMessage");
+const adminNoticeList = document.getElementById("adminNoticeList");
 
 
 /* =========================================================
@@ -263,6 +242,7 @@ const adminNoticeList =
 ========================================================= */
 
 function showWebsite() {
+
     if (loginScreen) {
         loginScreen.classList.add("hidden");
     }
@@ -270,9 +250,12 @@ function showWebsite() {
     if (website) {
         website.classList.remove("hidden");
     }
+
 }
 
+
 function showLogin() {
+
     if (loginScreen) {
         loginScreen.classList.remove("hidden");
     }
@@ -280,6 +263,7 @@ function showLogin() {
     if (website) {
         website.classList.add("hidden");
     }
+
 }
 
 
@@ -290,9 +274,13 @@ function showLogin() {
 onAuthStateChanged(auth, (user) => {
 
     if (user) {
+
         showWebsite();
+
     } else {
+
         showLogin();
+
     }
 
 });
@@ -304,15 +292,22 @@ onAuthStateChanged(auth, (user) => {
 
 if (loginForm) {
 
-    loginForm.addEventListener("submit", async (e) => {
+    loginForm.addEventListener("submit", async (event) => {
 
-        e.preventDefault();
+        event.preventDefault();
 
         const email = emailInput.value.trim();
         const password = passwordInput.value;
 
-        if (loginError) {
-            loginError.textContent = "";
+        loginError.textContent = "";
+
+        if (!email || !password) {
+
+            loginError.textContent =
+                "Please enter email and password.";
+
+            return;
+
         }
 
         try {
@@ -329,37 +324,8 @@ if (loginForm) {
 
             console.error(error);
 
-            if (loginError) {
-
-                if (
-                    error.code ===
-                    "auth/invalid-credential"
-                ) {
-                    loginError.textContent =
-                        "Invalid email or password.";
-                }
-
-                else if (
-                    error.code ===
-                    "auth/user-not-found"
-                ) {
-                    loginError.textContent =
-                        "Account not found.";
-                }
-
-                else if (
-                    error.code ===
-                    "auth/wrong-password"
-                ) {
-                    loginError.textContent =
-                        "Wrong password.";
-                }
-
-                else {
-                    loginError.textContent =
-                        error.message;
-                }
-            }
+            loginError.textContent =
+                getAuthError(error);
 
         }
 
@@ -379,12 +345,15 @@ if (signupBtn) {
         const email = emailInput.value.trim();
         const password = passwordInput.value;
 
+        loginError.textContent = "";
+
         if (!email || !password) {
 
             loginError.textContent =
                 "Enter email and password first.";
 
             return;
+
         }
 
         if (password.length < 6) {
@@ -393,6 +362,7 @@ if (signupBtn) {
                 "Password must be at least 6 characters.";
 
             return;
+
         }
 
         try {
@@ -411,10 +381,48 @@ if (signupBtn) {
             console.error(error);
 
             loginError.textContent =
-                error.message;
+                getAuthError(error);
+
         }
 
     });
+
+}
+
+
+/* =========================================================
+   AUTH ERROR
+========================================================= */
+
+function getAuthError(error) {
+
+    switch (error.code) {
+
+        case "auth/invalid-credential":
+            return "Invalid email or password.";
+
+        case "auth/user-not-found":
+            return "Account not found.";
+
+        case "auth/wrong-password":
+            return "Wrong password.";
+
+        case "auth/email-already-in-use":
+            return "This email is already registered.";
+
+        case "auth/invalid-email":
+            return "Invalid email address.";
+
+        case "auth/weak-password":
+            return "Password is too weak.";
+
+        case "auth/too-many-requests":
+            return "Too many attempts. Try again later.";
+
+        default:
+            return error.message || "Something went wrong.";
+
+    }
 
 }
 
@@ -443,7 +451,7 @@ if (logoutBtn) {
 
 
 /* =========================================================
-   PLAYERS
+   PLAYER RENDER
 ========================================================= */
 
 function renderPlayers(searchTerm = "") {
@@ -476,6 +484,7 @@ function renderPlayers(searchTerm = "") {
         `;
 
         return;
+
     }
 
     filteredPlayers.forEach((player) => {
@@ -486,21 +495,23 @@ function renderPlayers(searchTerm = "") {
 
         card.innerHTML = `
             <div class="player-number">
-                ${player.number}
+                ${escapeHTML(player.number)}
             </div>
 
             <div class="player-info">
-                <h3>${player.name}</h3>
-                <p>${player.position}</p>
+                <h3>${escapeHTML(player.name)}</h3>
+                <p>${escapeHTML(player.position)}</p>
             </div>
 
             <span class="player-position">
-                ${player.short}
+                ${escapeHTML(player.short)}
             </span>
         `;
 
         card.addEventListener("click", () => {
+
             openPlayerModal(player);
+
         });
 
         playerGrid.appendChild(card);
@@ -516,9 +527,9 @@ function renderPlayers(searchTerm = "") {
 
 if (playerSearch) {
 
-    playerSearch.addEventListener("input", (e) => {
+    playerSearch.addEventListener("input", (event) => {
 
-        renderPlayers(e.target.value);
+        renderPlayers(event.target.value);
 
     });
 
@@ -539,25 +550,26 @@ function openPlayerModal(player) {
         <div class="player-modal-info">
 
             <div class="player-modal-number">
-                ${player.number}
+                ${escapeHTML(player.number)}
             </div>
 
-            <h2>${player.name}</h2>
+            <h2>${escapeHTML(player.name)}</h2>
 
             <p>
                 <strong>Position:</strong>
-                ${player.position}
+                ${escapeHTML(player.position)}
             </p>
 
             <p>
                 <strong>Role:</strong>
-                ${player.short}
+                ${escapeHTML(player.short)}
             </p>
 
         </div>
     `;
 
     playerModal.classList.remove("hidden");
+
 }
 
 
@@ -577,10 +589,12 @@ if (playerModalClose) {
 
 if (playerModal) {
 
-    playerModal.addEventListener("click", (e) => {
+    playerModal.addEventListener("click", (event) => {
 
-        if (e.target === playerModal) {
+        if (event.target === playerModal) {
+
             playerModal.classList.add("hidden");
+
         }
 
     });
@@ -598,9 +612,11 @@ function formatDate(dateString) {
         return "TBA";
     }
 
-    const date = new Date(dateString + "T00:00:00");
+    const date = new Date(
+        dateString + "T00:00:00"
+    );
 
-    if (isNaN(date.getTime())) {
+    if (Number.isNaN(date.getTime())) {
         return dateString;
     }
 
@@ -619,39 +635,56 @@ function formatTime(timeString) {
         return "TBA";
     }
 
-    const [hours, minutes] =
-        timeString.split(":");
+    const parts = timeString.split(":");
 
-    let hour = parseInt(hours);
+    if (parts.length < 2) {
+        return timeString;
+    }
+
+    let hour = Number(parts[0]);
+    const minute = parts[1];
+
+    if (Number.isNaN(hour)) {
+        return timeString;
+    }
 
     const ampm = hour >= 12 ? "PM" : "AM";
 
     hour = hour % 12 || 12;
 
-    return `${hour}:${minutes} ${ampm}`;
+    return `${hour}:${minute} ${ampm}`;
+
 }
 
 
 function renderMatch() {
 
     if (opponentDisplay) {
+
         opponentDisplay.textContent =
             match.opponent || "Coming Soon";
+
     }
 
     if (matchDate) {
+
         matchDate.textContent =
             formatDate(match.date);
+
     }
 
     if (matchTime) {
+
         matchTime.textContent =
             formatTime(match.time);
+
     }
 
     if (matchVenue) {
+
         matchVenue.textContent =
             match.venue || "TBA";
+
     }
 
 }
@@ -667,7 +700,7 @@ function renderNotices() {
 
     noticeGrid.innerHTML = "";
 
-    if (notices.length === 0) {
+    if (!notices.length) {
 
         noticeGrid.innerHTML = `
             <div class="empty-state">
@@ -676,6 +709,7 @@ function renderNotices() {
         `;
 
         return;
+
     }
 
     const sortedNotices = [...notices].sort(
@@ -695,7 +729,9 @@ function renderNotices() {
                 ${formatDate(notice.date)}
             </div>
 
-            <h3>${escapeHTML(notice.title)}</h3>
+            <h3>
+                ${escapeHTML(notice.title)}
+            </h3>
 
             <p>
                 ${escapeHTML(notice.text)}
@@ -720,11 +756,13 @@ function renderAdminNotices() {
     adminNoticeList.innerHTML = "";
 
     if (adminNoticeCount) {
+
         adminNoticeCount.textContent =
             notices.length;
+
     }
 
-    if (notices.length === 0) {
+    if (!notices.length) {
 
         adminNoticeList.innerHTML = `
             <p class="empty-state">
@@ -733,6 +771,7 @@ function renderAdminNotices() {
         `;
 
         return;
+
     }
 
     const sortedNotices = [...notices].sort(
@@ -749,7 +788,10 @@ function renderAdminNotices() {
 
         item.innerHTML = `
             <div>
-                <h4>${escapeHTML(notice.title)}</h4>
+
+                <h4>
+                    ${escapeHTML(notice.title)}
+                </h4>
 
                 <small>
                     ${formatDate(notice.date)}
@@ -758,6 +800,7 @@ function renderAdminNotices() {
                 <p>
                     ${escapeHTML(notice.text)}
                 </p>
+
             </div>
 
             <button
@@ -777,12 +820,12 @@ function renderAdminNotices() {
 
 
 /* =========================================================
-   HTML ESCAPE
+   ESCAPE HTML
 ========================================================= */
 
-function escapeHTML(text) {
+function escapeHTML(value) {
 
-    return String(text)
+    return String(value)
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -793,16 +836,14 @@ function escapeHTML(text) {
 
 
 /* =========================================================
-   ADMIN LOGIN MODAL OPEN
+   ADMIN LOGIN OPEN
 ========================================================= */
 
 if (adminOpenBtn) {
 
     adminOpenBtn.addEventListener("click", () => {
 
-        if (adminLoginModal) {
-            adminLoginModal.classList.remove("hidden");
-        }
+        adminLoginModal.classList.remove("hidden");
 
         if (adminLoginError) {
             adminLoginError.textContent = "";
@@ -814,7 +855,7 @@ if (adminOpenBtn) {
 
 
 /* =========================================================
-   ADMIN LOGIN MODAL CLOSE
+   ADMIN LOGIN CLOSE
 ========================================================= */
 
 if (adminLoginClose) {
@@ -829,9 +870,9 @@ if (adminLoginClose) {
 
 if (adminLoginModal) {
 
-    adminLoginModal.addEventListener("click", (e) => {
+    adminLoginModal.addEventListener("click", (event) => {
 
-        if (e.target === adminLoginModal) {
+        if (event.target === adminLoginModal) {
 
             adminLoginModal.classList.add("hidden");
 
@@ -848,9 +889,9 @@ if (adminLoginModal) {
 
 if (adminLoginForm) {
 
-    adminLoginForm.addEventListener("submit", (e) => {
+    adminLoginForm.addEventListener("submit", (event) => {
 
-        e.preventDefault();
+        event.preventDefault();
 
         const username =
             adminUsername.value.trim();
@@ -858,16 +899,12 @@ if (adminLoginForm) {
         const password =
             adminPassword.value;
 
-        if (adminLoginError) {
-            adminLoginError.textContent = "";
-        }
+        adminLoginError.textContent = "";
 
         /*
          * DEMO ADMIN LOGIN
-         *
-         * NOTE:
-         * This is NOT secure for production because
-         * the credentials are visible in JavaScript.
+         * Username: admin
+         * Password: civilfc
          */
 
         if (
@@ -894,12 +931,8 @@ if (adminLoginForm) {
 
         } else {
 
-            if (adminLoginError) {
-
-                adminLoginError.textContent =
-                    "Invalid admin username or password.";
-
-            }
+            adminLoginError.textContent =
+                "Invalid admin username or password.";
 
         }
 
@@ -924,9 +957,9 @@ if (adminClose) {
 
 if (adminModal) {
 
-    adminModal.addEventListener("click", (e) => {
+    adminModal.addEventListener("click", (event) => {
 
-        if (e.target === adminModal) {
+        if (event.target === adminModal) {
 
             adminModal.classList.add("hidden");
 
@@ -949,9 +982,7 @@ if (adminLogout) {
             "civilFCAdmin"
         );
 
-        adminModal.classList.add(
-            "hidden"
-        );
+        adminModal.classList.add("hidden");
 
     });
 
@@ -965,23 +996,31 @@ if (adminLogout) {
 function loadAdminData() {
 
     if (opponentInput) {
+
         opponentInput.value =
             match.opponent || "";
+
     }
 
     if (dateInput) {
+
         dateInput.value =
             match.date || "";
+
     }
 
     if (timeInput) {
+
         timeInput.value =
             match.time || "";
+
     }
 
     if (venueInput) {
+
         venueInput.value =
             match.venue || "";
+
     }
 
     renderAdminNotices();
@@ -995,9 +1034,9 @@ function loadAdminData() {
 
 if (matchForm) {
 
-    matchForm.addEventListener("submit", (e) => {
+    matchForm.addEventListener("submit", (event) => {
 
-        e.preventDefault();
+        event.preventDefault();
 
         match = {
 
@@ -1050,49 +1089,38 @@ if (matchForm) {
 
 if (noticeForm) {
 
-    noticeForm.addEventListener("submit", (e) => {
+    noticeForm.addEventListener("submit", (event) => {
 
-        e.preventDefault();
+        event.preventDefault();
 
         const title =
             noticeTitle.value.trim();
 
-        const selectedDate =
-            noticeDate.value;
+        const date =
+            noticeDate.value ||
+            new Date().toISOString().split("T")[0];
 
         const text =
             noticeText.value.trim();
 
         if (!title || !text) {
 
-            if (noticeMessage) {
-
-                noticeMessage.textContent =
-                    "Please fill in all required fields.";
-
-            }
+            noticeMessage.textContent =
+                "Please fill in all required fields.";
 
             return;
-        }
 
-        const today =
-            new Date()
-                .toISOString()
-                .split("T")[0];
+        }
 
         const newNotice = {
 
-            id:
-                Date.now(),
+            id: Date.now(),
 
-            title:
-                title,
+            title: title,
 
-            date:
-                selectedDate || today,
+            date: date,
 
-            text:
-                text
+            text: text
 
         };
 
@@ -1108,18 +1136,14 @@ if (noticeForm) {
 
         noticeForm.reset();
 
-        if (noticeMessage) {
+        noticeMessage.textContent =
+            "Notice added successfully!";
 
-            noticeMessage.textContent =
-                "Notice added successfully!";
+        setTimeout(() => {
 
-            setTimeout(() => {
+            noticeMessage.textContent = "";
 
-                noticeMessage.textContent = "";
-
-            }, 3000);
-
-        }
+        }, 3000);
 
     });
 
@@ -1134,10 +1158,10 @@ if (adminNoticeList) {
 
     adminNoticeList.addEventListener(
         "click",
-        (e) => {
+        (event) => {
 
             const button =
-                e.target.closest(
+                event.target.closest(
                     ".delete-notice"
                 );
 
@@ -1146,11 +1170,10 @@ if (adminNoticeList) {
             const id =
                 Number(button.dataset.id);
 
-            notices =
-                notices.filter(
-                    (notice) =>
-                        notice.id !== id
-                );
+            notices = notices.filter(
+                (notice) =>
+                    notice.id !== id
+            );
 
             localStorage.setItem(
                 "civilFCNotices",
@@ -1174,11 +1197,6 @@ if (menuBtn && mainNav) {
 
     menuBtn.addEventListener("click", () => {
 
-        /*
-         * CSS uses nav.active
-         * so JS also uses active.
-         */
-
         mainNav.classList.toggle("active");
 
     });
@@ -1187,15 +1205,12 @@ if (menuBtn && mainNav) {
 
 
 /* =========================================================
-   CLOSE MOBILE MENU AFTER CLICK
+   CLOSE MOBILE MENU
 ========================================================= */
 
 if (mainNav) {
 
-    const navLinks =
-        mainNav.querySelectorAll("a");
-
-    navLinks.forEach((link) => {
+    mainNav.querySelectorAll("a").forEach((link) => {
 
         link.addEventListener("click", () => {
 
@@ -1209,7 +1224,7 @@ if (mainNav) {
 
 
 /* =========================================================
-   DARK / LIGHT THEME
+   THEME
 ========================================================= */
 
 function applyTheme(theme) {
@@ -1227,32 +1242,18 @@ function applyTheme(theme) {
 }
 
 
-/* Load saved theme */
-
 const savedTheme =
     localStorage.getItem("civilFCTheme");
 
-if (savedTheme) {
+applyTheme(savedTheme || "dark");
 
-    applyTheme(savedTheme);
-
-} else {
-
-    applyTheme("dark");
-
-}
-
-
-/* Theme button */
 
 if (themeBtn) {
 
     themeBtn.addEventListener("click", () => {
 
         const isLight =
-            document.body.classList.contains(
-                "light"
-            );
+            document.body.classList.contains("light");
 
         const newTheme =
             isLight ? "dark" : "light";
@@ -1270,19 +1271,22 @@ if (themeBtn) {
 
 
 /* =========================================================
-   NAVIGATION
+   SMOOTH NAVIGATION
 ========================================================= */
 
 document.querySelectorAll(
     'a[href^="#"]'
 ).forEach((link) => {
 
-    link.addEventListener("click", (e) => {
+    link.addEventListener("click", (event) => {
 
         const targetId =
             link.getAttribute("href");
 
-        if (!targetId || targetId === "#") {
+        if (
+            !targetId ||
+            targetId === "#"
+        ) {
             return;
         }
 
@@ -1291,7 +1295,7 @@ document.querySelectorAll(
 
         if (!target) return;
 
-        e.preventDefault();
+        event.preventDefault();
 
         target.scrollIntoView({
             behavior: "smooth",
@@ -1304,7 +1308,7 @@ document.querySelectorAll(
 
 
 /* =========================================================
-   INITIAL RENDER
+   INITIAL LOAD
 ========================================================= */
 
 renderPlayers();
@@ -1313,27 +1317,9 @@ renderNotices();
 
 
 /* =========================================================
-   AUTO LOAD ADMIN IF PREVIOUSLY LOGGED IN
-========================================================= */
-
-if (
-    localStorage.getItem("civilFCAdmin") === "true"
-) {
-
-    /*
-     * Don't automatically show dashboard.
-     * Admin can click Admin button.
-     */
-
-    console.log("Admin session found.");
-
-}
-
-
-/* =========================================================
-   FINAL MESSAGE
+   CONSOLE
 ========================================================= */
 
 console.log(
-    "Civil FC script loaded successfully."
+    "Civil FC JavaScript loaded successfully."
 );
